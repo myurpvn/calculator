@@ -130,7 +130,7 @@ fn main() {
             println!("Result: {result}\n");
         } else {
             println!("Input is not valid!");
-            println!("Input: {s}");
+            println!("Input: {s}\n");
         }
     }
 
