@@ -39,6 +39,7 @@ fn calculate_input(input_vec: &Vec<Input>) -> i32 {
             Input::Operation(operation) => ops_vec.push(operation),
             _ => {}
         }
+        // println!("DEBUG:result: {result_vec:?}");
         if result_vec.len() == 2 {
             let num2 = result_vec.pop().unwrap();
             let num1 = result_vec.pop().unwrap();
@@ -69,7 +70,10 @@ fn split_input(s: &str) -> (bool, Vec<Input>) {
         } else {
             if num_string.len() > 0 {
                 if expect_num {
-                    splitted_input.push(Input::Number(num_string.parse().unwrap()));
+                    splitted_input.push(Input::Number(
+                        num_string.parse::<i32>().expect("Please enter an integer!"),
+                    ));
+                    // println!("DEBUG:Splitted: {splitted_input:?}");
                     expect_num = false;
                     num_string.clear();
                 } else {
@@ -109,28 +113,35 @@ fn main() {
     println!("============ Welcome to the Rust Calculator ============");
 
     loop {
-        print!("Enter Expression: ");
-
-        let mut s: String = String::new();
+        print!("Enter Expression:> ");
+        let mut input = String::new();
+        let mut raw_input: String = String::new();
         let _ = stdout().flush();
         stdin()
-            .read_line(&mut s)
+            .read_line(&mut raw_input)
             .expect("Did not enter a correct string");
 
-        s = s.trim().to_string();
-
-        if s.chars().next().unwrap_or('_') == 'q' {
-            break;
+        if let Some(c) = raw_input.chars().nth(0) {
+            if c == 'q' || c == '\n' {
+                break;
+            } else if c == '-' || c == '+' {
+                input.push_str("0");
+                input.push_str(&raw_input);
+            } else {
+                input = raw_input.clone();
+            }
         }
 
-        let (is_valid, splitted_input) = split_input(&s);
+        input = input.trim().to_string();
+
+        let (is_valid, splitted_input) = split_input(&input);
 
         if is_valid {
             let result = calculate_input(&splitted_input);
-            println!("Result: {result}\n");
+            println!("{} = {}\n", raw_input.trim(), result);
         } else {
             println!("Input is not valid!");
-            println!("Input: {s}\n");
+            println!("Input: {raw_input}\n");
         }
     }
 
